@@ -12,7 +12,6 @@ class NeoRtags(object):
         self.vim = vim
 
     def init_mapping(self):
-        self.vim.command('let g:mapleader=","')
         self.register_mapping('ri', 'NeoRtagsSymbolInfo')
         self.register_mapping('rc', 'NeoRtagsFindSubclasses')
         self.register_mapping('rC', 'NeoRtagsFindSuperclasses')
