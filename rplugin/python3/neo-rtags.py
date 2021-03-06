@@ -10,6 +10,7 @@ from itertools import *
 class NeoRtags(object):
     def __init__(self, vim):
         self.vim = vim
+        self.content = None
 
     def init_mapping(self):
         self.register_mapping('ri', 'NeoRtagsSymbolInfo')
@@ -205,19 +206,21 @@ class NeoRtags(object):
         column = cursor[1] - 1
 
         if findstart:
+            self.content = '\n'.join(buffer[:])
+
             line = buffer[linenum]
-            while column > 0 and line[column].isalnum() or line[column] == '_':
+            while column > 0 and line[column].isidentifier():
                 column -= 1
 
             return column + 1
         else:
-            content = '\n'.join(buffer[:])
             cmd = ('--synchronous-completions -l %s:%d:%d --unsaved-file=%s:%d --json'
-                % (buffer.name, linenum + 1, column + len(base) + 2, buffer.name, len(content)))
+                % (buffer.name, linenum + 1, column + len(base) + 2, buffer.name, len(self.content)))
+
             if len(base) > 0:
                 cmd += ' --code-complete-prefix %s' % base
 
-            rc, stdout, stderr = self.run_command (cmd, content)
+            rc, stdout, stderr = self.run_command(cmd, self.content)
             if rc == 0:
                 result = json.loads(stdout)
                 completions = self.parse_completion_results(result)
